@@ -9,6 +9,12 @@ if (!globalForMongoose.__mongooseConn) {
 }
 const g = globalForMongoose.__mongooseConn;
 
+const connectOptions = {
+  serverSelectionTimeoutMS: 15_000,
+  socketTimeoutMS: 45_000,
+  maxPoolSize: 10,
+};
+
 /**
  * Connects to MongoDB using MONGODB_URI from environment.
  * Safe to call multiple times (idempotent).
@@ -19,13 +25,20 @@ export async function connectDB() {
     throw new Error('MONGODB_URI is not defined in environment');
   }
   mongoose.set('strictQuery', true);
+  mongoose.set('bufferCommands', false);
 
   if (mongoose.connection.readyState === 1) {
     return mongoose.connection;
   }
 
   if (!g.promise) {
-    g.promise = mongoose.connect(uri);
+    g.promise = mongoose
+      .connect(uri, connectOptions)
+      .then(() => mongoose.connection)
+      .catch((err) => {
+        g.promise = null;
+        throw err;
+      });
   }
   await g.promise;
   console.log('MongoDB connected');

@@ -33,17 +33,18 @@ app.use(
 );
 app.use(express.json());
 
-/** Vercel sets VERCEL=1; connect per cold start, reuse via db.js cache. */
-if (process.env.VERCEL === '1') {
-  app.use(async (_req, _res, next) => {
-    try {
-      await connectDB();
-      next();
-    } catch (e) {
-      next(e);
-    }
-  });
-}
+/**
+ * Ensure Mongo is ready before route handlers (required on Vercel serverless).
+ * On long-lived `node server.js`, connectDB() is a no-op once connected.
+ */
+app.use(async (_req, _res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (e) {
+    next(e);
+  }
+});
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
