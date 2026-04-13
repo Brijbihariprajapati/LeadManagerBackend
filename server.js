@@ -12,7 +12,9 @@ async function start() {
   }
   try {
     await connectDB();
-    await migrateLeadFields().catch((err) => console.warn('[migrateLeadFields]', err.message));
+    if (process.env.VERCEL !== '1') {
+      await migrateLeadFields().catch((err) => console.warn('[migrateLeadFields]', err.message));
+    }
     app.listen(PORT, () => {
       console.log(`API listening on http://localhost:${PORT}`);
     });

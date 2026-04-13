@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { connectDB } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import leadRoutes from './routes/leadRoutes.js';
@@ -31,6 +32,18 @@ app.use(
   })
 );
 app.use(express.json());
+
+/** Vercel sets VERCEL=1; connect per cold start, reuse via db.js cache. */
+if (process.env.VERCEL === '1') {
+  app.use(async (_req, _res, next) => {
+    try {
+      await connectDB();
+      next();
+    } catch (e) {
+      next(e);
+    }
+  });
+}
 
 app.get('/health', (_req, res) => {
   res.json({ ok: true });
