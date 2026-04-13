@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets (use .env.example as template)
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime / uploads (add paths your app writes to)
+tmp/
+temp/
+uploads/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Optional build output
+dist/
+build/
